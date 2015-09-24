@@ -9,8 +9,10 @@ public class JobImpl implements Job {
 	private final static long DEFAULT_PRIORITY = 10000L;
 
 	private final static int DEFAULT_TIME_TO_RUN = 10000;
-	
+
 	private final static int DEFAULT_DELAY = 0;
+
+	private int JobId;
 
 	private byte[] data;
 
@@ -20,8 +22,16 @@ public class JobImpl implements Job {
 
 	private int time_to_run;
 
+	public void setJobId(int JobId) {
+		this.JobId = JobId;
+	}
+
 	public void setData(String data) {
 		setData(data.getBytes());
+	}
+
+	public byte[] getData() {
+		return data;
 	}
 
 	public void setData(byte[] byteArray) {
@@ -33,11 +43,11 @@ public class JobImpl implements Job {
 	}
 
 	public JobImpl(byte[] data) {
-		this(DEFAULT_PRIORITY, DEFAULT_DELAY,DEFAULT_TIME_TO_RUN,data);
+		this(DEFAULT_PRIORITY, DEFAULT_DELAY, DEFAULT_TIME_TO_RUN, data);
 	}
 
 	public JobImpl(long priority, byte[] data) {
-		this(priority, DEFAULT_DELAY, DEFAULT_TIME_TO_RUN,data);
+		this(priority, DEFAULT_DELAY, DEFAULT_TIME_TO_RUN, data);
 	}
 
 	public JobImpl(long priority, int delay, byte[] data) {
