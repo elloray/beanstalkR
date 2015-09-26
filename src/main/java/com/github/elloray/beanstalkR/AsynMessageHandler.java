@@ -29,28 +29,30 @@ public class AsynMessageHandler {
 		}
 	}
 
-	public void sendMessage(byte[] send, MsgType type) throws IOException {
+	public synchronized void asynSendMessage(byte[] send, MsgType type)
+			throws IOException {
 
-		Response response = new Response();
-
-		try {
-			socket.setTcpNoDelay(true);
-			InputStream in = socket.getInputStream();
-			OutputStream out = socket.getOutputStream();
-			out.write(send);
-			out.flush();
-			response.setCommand(getCommand(in));
-			if (type == MsgType.DATA) {
-				response.setData(getBody(in, response.getCommand()));
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					Response response = new Response();
+					System.out.println(socket.getLocalPort());
+					socket.setTcpNoDelay(true);
+					InputStream in = socket.getInputStream();
+					OutputStream out = socket.getOutputStream();
+					out.write(send);
+					out.flush();
+					response.setCommand(getCommand(in));
+					if (type == MsgType.DATA) {
+						response.setData(getBody(in, response.getCommand()));
+					}
+					responses.put(response);
+				} catch (IOException | InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-			responses.put(response);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new IOException("some trouble with connecting");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
+		}.start();
 	}
 
 	private byte[] getCommand(InputStream in) throws IOException {
@@ -59,6 +61,7 @@ public class AsynMessageHandler {
 		int next;
 		boolean flag = false;
 		while (true) {
+			System.out.println(in.available());
 			next = in.read();
 			if ((next == '\n') && flag) {
 				break;
