@@ -6,12 +6,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class MessageHandler {
+public class AsynMessageHandler {
+
+	private static BlockingQueue<Response> responses = new LinkedBlockingQueue<Response>();
 
 	private Socket socket;
-	
-	public MessageHandler(String host, int port) {
+
+	public static BlockingQueue<Response> getResponse() {
+		return responses;
+	}
+
+	public AsynMessageHandler(String host, int port) {
 		try {
 			socket = new Socket(host, port);
 		} catch (UnknownHostException e) {
@@ -21,7 +29,7 @@ public class MessageHandler {
 		}
 	}
 
-	public Response sendMessage(byte[] send, MsgType type) throws IOException {
+	public void sendMessage(byte[] send, MsgType type) throws IOException {
 
 		Response response = new Response();
 
@@ -35,13 +43,16 @@ public class MessageHandler {
 			if (type == MsgType.DATA) {
 				response.setData(getBody(in, response.getCommand()));
 			}
+			responses.put(response);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new IOException("some trouble with connecting");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		return response;
+
 	}
-	
+
 	private byte[] getCommand(InputStream in) throws IOException {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();

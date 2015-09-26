@@ -2,14 +2,18 @@ package com.github.elloray.beanstalkR.common;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.github.elloray.beanstalkR.api.Strategy;
-
 public class HashStrategy implements Strategy{
 
-	private static AtomicInteger i = new AtomicInteger(0);
+	private AtomicInteger i = new AtomicInteger(0);
+	
+	private int mod = 0;
+	
+	public HashStrategy(int mod){
+		this.mod = mod;
+	}
 	
 	public int sharding() {
-		return i.incrementAndGet()%5;
+		return i.incrementAndGet()%mod;
 	}
 
 	public void reset() {

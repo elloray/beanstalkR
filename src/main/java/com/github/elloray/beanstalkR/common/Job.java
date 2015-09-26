@@ -1,8 +1,6 @@
 package com.github.elloray.beanstalkR.common;
 
-import com.github.elloray.beanstalkR.api.Job;
-
-public class JobImpl implements Job {
+public class Job {
 
 	private final static long MAX_JOB_SIZE = (long) Math.pow(2, 16);
 
@@ -42,19 +40,19 @@ public class JobImpl implements Job {
 		this.priority = priority;
 	}
 
-	public JobImpl(byte[] data) {
+	public Job(byte[] data) {
 		this(DEFAULT_PRIORITY, DEFAULT_DELAY, DEFAULT_TIME_TO_RUN, data);
 	}
 
-	public JobImpl(long priority, byte[] data) {
+	public Job(long priority, byte[] data) {
 		this(priority, DEFAULT_DELAY, DEFAULT_TIME_TO_RUN, data);
 	}
 
-	public JobImpl(long priority, int delay, byte[] data) {
+	public Job(long priority, int delay, byte[] data) {
 		this(priority, delay, DEFAULT_TIME_TO_RUN, data);
 	}
 
-	public JobImpl(long priority, int delay, int time_to_run, byte[] data) {
+	public Job(long priority, int delay, int time_to_run, byte[] data) {
 		this.priority = priority;
 		this.delay = delay;
 		this.time_to_run = time_to_run;
