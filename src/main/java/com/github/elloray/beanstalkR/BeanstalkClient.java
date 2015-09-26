@@ -1,4 +1,4 @@
-package com.github.elloray.beanstalkR.common;
+package com.github.elloray.beanstalkR;
 
 import java.io.IOException;
 import java.util.HashMap;

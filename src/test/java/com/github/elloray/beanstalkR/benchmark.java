@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.github.elloray.beanstalkR.common.BeanstalkClient;
+import com.github.elloray.beanstalkR.BeanstalkClient;
 import com.surftools.BeanstalkClient.Client;
 import com.surftools.BeanstalkClient.Job;
 import com.xiaoju.ecom.common.beanstalkd.client.BeanstalkdClient;
@@ -148,7 +148,7 @@ public class benchmark {
 		client.watch(tubename);
 		System.out.println("watch time : "+(System.currentTimeMillis() - start));
 		
-		BlockingQueue<com.github.elloray.beanstalkR.common.Job> jobs = null;
+		BlockingQueue<com.github.elloray.beanstalkR.Job> jobs = null;
 		start = System.currentTimeMillis();
 		for (int i = 0; i < NUM; i++) {
 			client.asynreserve();
