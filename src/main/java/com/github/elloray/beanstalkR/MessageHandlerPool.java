@@ -4,20 +4,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.ietf.jgss.Oid;
 
 public class MessageHandlerPool {
 
-	private static ArrayList<AsynMessageHandler> asynMessageHandlers = new ArrayList<AsynMessageHandler>();
+	private BlockingQueue<Response> responses = new LinkedBlockingQueue<Response>();
 
 	private ArrayList<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
 
 	private Strategy strategy = null;
 
-	private ExecutorService executor = Executors.newFixedThreadPool(10);
+	private ExecutorService executor;
+
+	private BlockingQueue<Future<Response>> futures = new LinkedBlockingQueue<Future<Response>>();
 
 	public MessageHandlerPool(List<String> servers, Strategy strategy) {
 		this.strategy = strategy;
@@ -25,9 +32,8 @@ public class MessageHandlerPool {
 			String[] serverinfo = server.split(":");
 			messageHandlers.add(new MessageHandler(serverinfo[0], Integer
 					.parseInt(serverinfo[1])));
-			asynMessageHandlers.add(new AsynMessageHandler(serverinfo[0],
-					Integer.parseInt(serverinfo[1])));
 		}
+		executor = Executors.newFixedThreadPool(servers.size());
 	}
 
 	public Response submit(byte[] send, MsgType type) throws IOException {
@@ -35,21 +41,35 @@ public class MessageHandlerPool {
 	}
 
 	public void asynsubmit(byte[] send, MsgType type) throws IOException {
-		executor.execute(new Thread() {
+		Future<Response> response = executor.submit(new Callable<Response>() {
 			@Override
-			public void run() {
-				try {
-					asynMessageHandlers.get(strategy.sharding()).sendMessage(
-							send, type);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			public Response call() throws Exception {
+
+				return messageHandlers.get(strategy.sharding()).sendMessage(
+						send, type);
 			}
 		});
+		try {
+			futures.put(response);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public BlockingQueue<Response> getResponses() {
-		return AsynMessageHandler.getResponse();
+	public Response getResponse() {
+		try {
+			Future<Response> future = futures.take();
+			while (future.get() == null) {
+			}
+			return future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public void stop() {
+		executor.shutdown();
 	}
 }

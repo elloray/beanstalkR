@@ -6,11 +6,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageHandler {
 
 	private Socket socket;
-	
+
+	private static BlockingQueue<Response> responses = new LinkedBlockingQueue<Response>();
+
+
 	public MessageHandler(String host, int port) {
 		try {
 			socket = new Socket(host, port);
@@ -21,7 +32,7 @@ public class MessageHandler {
 		}
 	}
 
-	public Response sendMessage(byte[] send, MsgType type) throws IOException {
+	public synchronized Response sendMessage(byte[] send, MsgType type) throws IOException {
 
 		Response response = new Response();
 
@@ -41,7 +52,7 @@ public class MessageHandler {
 		}
 		return response;
 	}
-	
+
 	private byte[] getCommand(InputStream in) throws IOException {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -62,7 +73,6 @@ public class MessageHandler {
 				bos.write(next);
 			}
 		}
-		// System.out.println(new String(bos.toByteArray()));
 		bos.flush();
 		bos.close();
 		return bos.toByteArray();
@@ -78,4 +88,8 @@ public class MessageHandler {
 		return receive;
 	}
 
+
+	public static BlockingQueue<Response> getResponse() {
+		return responses;
+	}
 }

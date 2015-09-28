@@ -1,6 +1,7 @@
 package com.github.elloray.beanstalkR;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +18,15 @@ public class BeanstalkClient {
 
 	private MessageHandlerPool pool = null;
 
+	private int server_num;
+
 	public BeanstalkClient(List<String> servers) {
 		this(servers, new HashStrategy(servers.size()));
+		server_num = servers.size();
 	}
 
 	public BeanstalkClient(List<String> servers, Strategy strategy) {
-		pool = new MessageHandlerPool(servers,strategy);
+		pool = new MessageHandlerPool(servers, strategy);
 	}
 
 	public void use(String TubeName) {
@@ -34,27 +38,29 @@ public class BeanstalkClient {
 	}
 
 	public Job reserve() throws IOException {
-
-		Response response = pool.submit(Commands.reserve(), MsgType.DATA);
-		Job job = new Job(response.getData());
+		Job job = new Job(pool.submit(Commands.reserve(), MsgType.DATA)
+				.getData());
 		return job;
 	}
+
 	public void asynreserve() throws IOException {
-		pool.asynsubmit(Commands.reserve(), MsgType.DATA);
-		
-	}
-	public BlockingQueue<Job> getJobs(){
-		BlockingQueue<Response> responses = pool.getResponses();
-		BlockingQueue<Job> jobs = new LinkedBlockingQueue<Job>();
+
 		try {
-			jobs.put(new Job(responses.take().getData()));
-		} catch (InterruptedException e) {
+			pool.asynsubmit(Commands.reserve(), MsgType.DATA);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public List<Job> getJobs(int num) {
+		List<Job> jobs = new ArrayList<Job>();
+		for (int i = 0; i < num; i++) {
+			Job job = new Job(pool.getResponse().getData());
+			jobs.add(job);
+		}
 		return jobs;
 	}
-	
 
 	public Job reserve(int timeout) {
 		// TODO Auto-generated method stub
@@ -83,8 +89,11 @@ public class BeanstalkClient {
 
 	public long watch(String TubeName) throws IOException {
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < server_num; i++) {
 			pool.submit(Commands.watch(TubeName), MsgType.COMMAND);
+		}
+		for (int i = 0; i < server_num; i++) {
+			Job job = new Job(pool.getResponse().getCommand());
 		}
 		return 0;
 	}
@@ -111,17 +120,21 @@ public class BeanstalkClient {
 
 	public Map<String, String> stat(String server) throws IOException {
 
-		Response response = pool.submit(Commands.stats(), MsgType.DATA);
-		String string = new String(response.getData());
+		pool.submit(Commands.stats(), MsgType.DATA);
+		String string = new String(pool.getResponse().getData());
 		Map<String, String> map = new HashMap<String, String>();
 		String[] tokens = string.split("\n");
 		for (int i = 2; i < tokens.length - 1; i++) {
 			String[] kv = tokens[i].split(":");
 			map.put(kv[0], kv[1]);
 		}
-		 for(String key:map.keySet()){
-		 System.out.println(key+":"+map.get(key));
-		 }
+		for (String key : map.keySet()) {
+			System.out.println(key + ":" + map.get(key));
+		}
 		return map;
+	}
+
+	public void stop() {
+		pool.stop();
 	}
 }
