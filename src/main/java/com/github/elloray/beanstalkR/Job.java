@@ -32,8 +32,8 @@ public class Job {
 		return data;
 	}
 
-	public void setData(byte[] byteArray) {
-		data = byteArray;
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 
 	public void setPriority(long priority) {
@@ -59,4 +59,8 @@ public class Job {
 		this.data = data;
 	}
 
+	public void delete() {
+		
+	}
+	
 }

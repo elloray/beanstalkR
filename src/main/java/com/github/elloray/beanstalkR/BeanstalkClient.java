@@ -44,11 +44,9 @@ public class BeanstalkClient {
 	}
 
 	public void asynreserve() throws IOException {
-
 		try {
 			pool.asynsubmit(Commands.reserve(), MsgType.DATA);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -56,15 +54,18 @@ public class BeanstalkClient {
 	public List<Job> getJobs(int num) {
 		List<Job> jobs = new ArrayList<Job>();
 		for (int i = 0; i < num; i++) {
-			Job job = new Job(pool.getResponse().getData());
+			Response response = pool.getResponse();
+			Job job = new Job(response.getData());
+//			job.setJobId(response.getCommand());
 			jobs.add(job);
 		}
 		return jobs;
 	}
 
-	public Job reserve(int timeout) {
-		// TODO Auto-generated method stub
-		return null;
+	public Job reserve(int timeout) throws IOException {
+		Job job = new Job(pool.submit(Commands.reservewithTimeout(timeout), MsgType.DATA)
+				.getData());
+		return job;
 	}
 
 	public int delete(int JobId) {

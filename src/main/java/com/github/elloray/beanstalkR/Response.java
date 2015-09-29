@@ -1,7 +1,9 @@
 package com.github.elloray.beanstalkR;
 
 public class Response {
+	
 	private byte[] command;
+	
 	private byte[] data;
 
 	public byte[] getCommand() {

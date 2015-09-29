@@ -16,8 +16,6 @@ import org.ietf.jgss.Oid;
 
 public class MessageHandlerPool {
 
-	private BlockingQueue<Response> responses = new LinkedBlockingQueue<Response>();
-
 	private ArrayList<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
 
 	private Strategy strategy = null;
