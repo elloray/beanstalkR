@@ -27,46 +27,43 @@ public class MessageHandlerPool {
 	public MessageHandlerPool(List<String> servers, Strategy strategy) {
 		this.strategy = strategy;
 		for (String server : servers) {
+			// init pool
 			String[] serverinfo = server.split(":");
 			messageHandlers.add(new MessageHandler(serverinfo[0], Integer
 					.parseInt(serverinfo[1])));
 		}
+		// init asynsubmit pool
 		executor = Executors.newFixedThreadPool(servers.size());
 	}
 
-	public Response submit(byte[] send, MsgType type) throws IOException {
-		return messageHandlers.get(strategy.sharding()).sendMessage(send, type);
+	public Response submit(byte[] send, MsgType type, String ErrorCode)
+			throws IOException {
+		return messageHandlers.get(strategy.sharding()).sendMessage(send, type,
+				ErrorCode);
 	}
 
-	public void asynsubmit(byte[] send, MsgType type) throws IOException {
+	public void asynsubmit(byte[] send, MsgType type, String ErrorCode)
+			throws IOException, InterruptedException {
 		Future<Response> response = executor.submit(new Callable<Response>() {
 			@Override
 			public Response call() throws Exception {
-
 				return messageHandlers.get(strategy.sharding()).sendMessage(
-						send, type);
+						send, type, ErrorCode);
 			}
 		});
-		try {
-			futures.put(response);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		futures.put(response);
 	}
 
-	public Response getResponse() {
-		try {
-			Future<Response> future = futures.take();
-			while (future.get() == null) {
-			}
-			return future.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+	public Response getResponse() throws InterruptedException,
+			ExecutionException {
+		Future<Response> future = futures.take();
+		// wait for getting value
+		while (future.get() == null) {
 		}
-		return null;
+		return future.get();
 	}
 
+	// kill executor
 	public void stop() {
 		executor.shutdown();
 	}

@@ -58,9 +58,4 @@ public class Job {
 		this.time_to_run = time_to_run;
 		this.data = data;
 	}
-
-	public void delete() {
-		
-	}
-	
 }

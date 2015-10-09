@@ -21,7 +21,7 @@ public class BeanstalkClient {
 	private int server_num;
 
 	public BeanstalkClient(List<String> servers) {
-		this(servers, new HashStrategy(servers.size()));
+		this(servers, new RoundRobinStrategy(servers.size()));
 		server_num = servers.size();
 	}
 
@@ -38,33 +38,35 @@ public class BeanstalkClient {
 	}
 
 	public Job reserve() throws IOException {
-		Job job = new Job(pool.submit(Commands.reserve(), MsgType.DATA)
-				.getData());
+		Job job = new Job(pool.submit(Commands.reserve(), MsgType.DATA,
+				ResultCode.RESERVE_OK).getDataBody());
 		return job;
 	}
 
 	public void asynreserve() throws IOException {
 		try {
-			pool.asynsubmit(Commands.reserve(), MsgType.DATA);
+			pool.asynsubmit(Commands.reserve(), MsgType.DATA,
+					ResultCode.RESERVE_OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public List<Job> getJobs(int num) {
+	public List<Job> getJobs(int num) throws InterruptedException,
+			ExecutionException {
 		List<Job> jobs = new ArrayList<Job>();
 		for (int i = 0; i < num; i++) {
 			Response response = pool.getResponse();
-			Job job = new Job(response.getData());
-//			job.setJobId(response.getCommand());
+			Job job = new Job(response.getDataBody());
+//			 job.setJobId();
 			jobs.add(job);
 		}
 		return jobs;
 	}
 
 	public Job reserve(int timeout) throws IOException {
-		Job job = new Job(pool.submit(Commands.reservewithTimeout(timeout), MsgType.DATA)
-				.getData());
+		Job job = new Job(pool.submit(Commands.reservewithTimeout(timeout),
+				MsgType.DATA, ResultCode.RESERVE_OK).getDataBody());
 		return job;
 	}
 
@@ -88,13 +90,14 @@ public class BeanstalkClient {
 		return 0;
 	}
 
-	public long watch(String TubeName) throws IOException {
+	public long watch(String TubeName) throws IOException,
+			InterruptedException, ExecutionException {
 
 		for (int i = 0; i < server_num; i++) {
-			pool.submit(Commands.watch(TubeName), MsgType.COMMAND);
+			pool.submit(Commands.watch(TubeName), MsgType.COMMAND, null);
 		}
 		for (int i = 0; i < server_num; i++) {
-			Job job = new Job(pool.getResponse().getCommand());
+			Job job = new Job(pool.getResponse().getCommandBody());
 		}
 		return 0;
 	}
@@ -104,25 +107,18 @@ public class BeanstalkClient {
 		return 0;
 	}
 
-	public Job peek(JOB_TYPE type) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Job peek(int JobId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Map<String, String> statJob(int JobId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Map<String, String> stat(String server) throws IOException {
-
-		pool.submit(Commands.stats(), MsgType.DATA);
-		String string = new String(pool.getResponse().getData());
+	public Map<String, String> stat(String server) throws IOException,
+			InterruptedException, ExecutionException {
+		pool.submit(Commands.stats(), MsgType.DATA, ResultCode.STATS_OK);
+		String string = new String(pool.getResponse().getDataBody());
 		Map<String, String> map = new HashMap<String, String>();
 		String[] tokens = string.split("\n");
 		for (int i = 2; i < tokens.length - 1; i++) {

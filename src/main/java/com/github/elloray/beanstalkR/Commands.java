@@ -34,11 +34,12 @@ public class Commands {
 		return ("delete" + SPACE + String.valueOf(JobId) + END_STRING)
 				.getBytes();
 	}
-	
+
 	public final static byte[] put(int pri, int delay, int ttr, int bytes,
 			byte[] data) {
 		return ("put" + SPACE + String.valueOf(pri) + SPACE
-				+ String.valueOf(delay) + SPACE + String.valueOf(ttr) + SPACE + String
-					.valueOf(bytes)).getBytes();
+				+ String.valueOf(delay) + SPACE + String.valueOf(ttr) + SPACE
+				+ String.valueOf(bytes) + END_STRING + new String(data))
+				.getBytes();
 	}
 }

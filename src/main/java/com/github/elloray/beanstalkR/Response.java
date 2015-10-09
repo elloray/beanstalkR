@@ -6,19 +6,19 @@ public class Response {
 	
 	private byte[] data;
 
-	public byte[] getCommand() {
+	public byte[] getCommandBody() {
 		return command;
 	}
 
-	public void setCommand(byte[] command) {
+	public void setCommandBody(byte[] command) {
 		this.command = command;
 	}
 
-	public byte[] getData() {
+	public byte[] getDataBody() {
 		return data;
 	}
 
-	public void setData(byte[] data) {
+	public void setDataBody(byte[] data) {
 		this.data = data;
 	}
 }

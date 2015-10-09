@@ -2,13 +2,13 @@ package com.github.elloray.beanstalkR;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HashStrategy implements Strategy{
+public class RoundRobinStrategy implements Strategy{
 
 	private AtomicInteger i = new AtomicInteger(0);
 	
 	private int mod = 0;
 	
-	public HashStrategy(int mod){
+	public RoundRobinStrategy(int mod){
 		this.mod = mod;
 	}
 	
@@ -17,12 +17,10 @@ public class HashStrategy implements Strategy{
 	}
 
 	public void reset() {
-		// TODO Auto-generated method stub
-		
+		i.set(0);
 	}
 
 	public boolean retry() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

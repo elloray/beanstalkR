@@ -24,11 +24,11 @@ public class benchmark {
 	public static void main(String[] args) throws UnknownHostException,
 			IOException, InterruptedException {
 
-		int NUM = 100000;
+		int NUM = 1;
 		String host = "localhost";
-
+		
 //		 prepare(host, NUM);
-		 TestA(host, NUM);
+//		 TestA(host, NUM);
 //		 System.err.println("--------------------------\n");
 //		TestB(host, NUM);
 		// System.err.println("--------------------------\n");
@@ -42,22 +42,22 @@ public class benchmark {
 	public static void prepare(String host, int NUM) {
 		Client bClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
 				9001);
-		Client cClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
-				9002);
-		Client dClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
-				9003);
+//		Client cClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
+//				9002);
+//		Client dClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
+//				9003);
 
 		bClient.useTube(tubename);
-		cClient.useTube(tubename);
-		dClient.useTube(tubename);
+//		cClient.useTube(tubename);
+//		dClient.useTube(tubename);
 
 		byte[] data = new byte[1000];
 		Random random = new Random();
 		random.nextBytes(data);
 		for (int i = 0; i < NUM; i++) {
 			bClient.put(1000, 0, 1, data);
-			cClient.put(1000, 0, 1, data);
-			dClient.put(1000, 0, 1, data);
+//			cClient.put(1000, 0, 1, data);
+//			dClient.put(1000, 0, 1, data);
 		}
 	}
 
@@ -83,7 +83,7 @@ public class benchmark {
 	}
 
 	private static void TestB(String host, int NUM) throws IOException {
-		Client client = new ClientImpl(host, 9002);
+		Client client = new ClientImpl(host, 9001);
 		for(String key:client.stats().keySet()){
 			System.out.println(key+":"+client.stats().get(key));
 		}
