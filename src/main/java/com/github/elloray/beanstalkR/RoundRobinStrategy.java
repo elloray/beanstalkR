@@ -6,7 +6,7 @@ public class RoundRobinStrategy implements Strategy{
 
 	private AtomicInteger i = new AtomicInteger(0);
 	
-	private int mod = 0;
+	private int mod = 1;
 	
 	public RoundRobinStrategy(int mod){
 		this.mod = mod;

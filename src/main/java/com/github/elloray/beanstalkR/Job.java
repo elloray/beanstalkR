@@ -6,11 +6,15 @@ public class Job {
 
 	private final static long DEFAULT_PRIORITY = 10000L;
 
-	private final static int DEFAULT_TIME_TO_RUN = 10000;
+	private final static int DEFAULT_TIME_TO_RUN = 1;
 
 	private final static int DEFAULT_DELAY = 0;
 
 	private int JobId;
+
+	public int getJobId() {
+		return JobId;
+	}
 
 	private byte[] data;
 
@@ -28,6 +32,26 @@ public class Job {
 		setData(data.getBytes());
 	}
 
+	public int getDelay() {
+		return delay;
+	}
+
+	public void setDelay(int delay) {
+		this.delay = delay;
+	}
+
+	public int getTime_to_run() {
+		return time_to_run;
+	}
+
+	public void setTime_to_run(int time_to_run) {
+		this.time_to_run = time_to_run;
+	}
+
+	public long getPriority() {
+		return priority;
+	}
+	
 	public byte[] getData() {
 		return data;
 	}
@@ -53,9 +77,15 @@ public class Job {
 	}
 
 	public Job(long priority, int delay, int time_to_run, byte[] data) {
+		
 		this.priority = priority;
 		this.delay = delay;
 		this.time_to_run = time_to_run;
 		this.data = data;
+	}
+	
+	@Override
+	public String toString(){
+		return new String(data);
 	}
 }

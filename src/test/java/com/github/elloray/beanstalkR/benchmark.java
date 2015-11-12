@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.github.elloray.beanstalkR.BeanstalkClient;
@@ -26,38 +27,40 @@ public class benchmark {
 
 		int NUM = 1;
 		String host = "localhost";
-		
-//		 prepare(host, NUM);
-//		 TestA(host, NUM);
-//		 System.err.println("--------------------------\n");
-//		TestB(host, NUM);
+
+		// prepare(host, NUM);
+		// TestA(host, NUM);
 		// System.err.println("--------------------------\n");
-//		 TestC(host, NUM);
+		// TestB(host, NUM);
+		// System.err.println("--------------------------\n");
+		// TestC(host, NUM);
 		// System.err.println("--------------------------\n");
 		// TestD(host, NUM);
 		// System.err.println("--------------------------\n");
-//		 TestE(host, NUM);
+		// TestE(host, NUM);
 	}
 
 	public static void prepare(String host, int NUM) {
 		Client bClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
 				9001);
-//		Client cClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
-//				9002);
-//		Client dClient = new com.surftools.BeanstalkClientImpl.ClientImpl(host,
-//				9003);
+		// Client cClient = new
+		// com.surftools.BeanstalkClientImpl.ClientImpl(host,
+		// 9002);
+		// Client dClient = new
+		// com.surftools.BeanstalkClientImpl.ClientImpl(host,
+		// 9003);
 
 		bClient.useTube(tubename);
-//		cClient.useTube(tubename);
-//		dClient.useTube(tubename);
+		// cClient.useTube(tubename);
+		// dClient.useTube(tubename);
 
 		byte[] data = new byte[1000];
 		Random random = new Random();
 		random.nextBytes(data);
 		for (int i = 0; i < NUM; i++) {
 			bClient.put(1000, 0, 1, data);
-//			cClient.put(1000, 0, 1, data);
-//			dClient.put(1000, 0, 1, data);
+			// cClient.put(1000, 0, 1, data);
+			// dClient.put(1000, 0, 1, data);
 		}
 	}
 
@@ -84,8 +87,8 @@ public class benchmark {
 
 	private static void TestB(String host, int NUM) throws IOException {
 		Client client = new ClientImpl(host, 9001);
-		for(String key:client.stats().keySet()){
-			System.out.println(key+":"+client.stats().get(key));
+		for (String key : client.stats().keySet()) {
+			System.out.println(key + ":" + client.stats().get(key));
 		}
 	}
 
@@ -93,10 +96,10 @@ public class benchmark {
 		ArrayList<String> list = new ArrayList<String>();
 		String host1 = host + ":9001";
 		list.add(host1);
-		 String host2 = host + ":9002";
-		 list.add(host2);      
-		 String host3 = host + ":9003";
-		 list.add(host3);
+		String host2 = host + ":9002";
+		list.add(host2);
+		String host3 = host + ":9003";
+		list.add(host3);
 
 		long start = System.currentTimeMillis();
 		BeanstalkdClient xiaojuClient = new BeanstalkdClient(list);
@@ -116,7 +119,8 @@ public class benchmark {
 				+ (System.currentTimeMillis() - start));
 	}
 
-	private static void TestD(String host, int NUM) throws IOException {
+	private static void TestD(String host, int NUM) throws IOException,
+			InterruptedException, ExecutionException {
 		ArrayList<String> list = new ArrayList<String>();
 		String host1 = host + ":9001";
 		list.add(host1);
@@ -145,14 +149,15 @@ public class benchmark {
 		client.stop();
 	}
 
-	private static void TestE(String host, int NUM) throws IOException {
+	private static void TestE(String host, int NUM) throws IOException,
+			InterruptedException, ExecutionException {
 		ArrayList<String> list = new ArrayList<String>();
 		String host1 = host + ":9001";
 		list.add(host1);
-//		String host2 = host + ":9002";
-//		list.add(host2);
-//		String host3 = host + ":9003";
-//		list.add(host3);
+		// String host2 = host + ":9002";
+		// list.add(host2);
+		// String host3 = host + ":9003";
+		// list.add(host3);
 		long start = System.currentTimeMillis();
 		BeanstalkClient client = new BeanstalkClient(list);
 		System.out.println("init time : "
@@ -167,13 +172,13 @@ public class benchmark {
 		for (int i = 0; i < NUM; i++) {
 			client.asynreserve();
 		}
-//		System.out.println("send time : "
-//				+ (System.currentTimeMillis() - start));
+		// System.out.println("send time : "
+		// + (System.currentTimeMillis() - start));
 
 		// BlockingQueue<com.github.elloray.beanstalkR.Job> jobs
 		// =client.getJobs();
 
-//		start = System.currentTimeMillis();
+		// start = System.currentTimeMillis();
 		client.getJobs(NUM);
 		client.stop();
 		// System.out.println(new String(client.getJobs().take().getData()));

@@ -1,6 +1,6 @@
 package com.github.elloray.beanstalkR;
 
-public class Commands {
+public class BeanstalkCommands {
 
 	private final static String END_STRING = "\r\n";
 	private final static String SPACE = " ";
@@ -35,11 +35,11 @@ public class Commands {
 				.getBytes();
 	}
 
-	public final static byte[] put(int pri, int delay, int ttr, int bytes,
-			byte[] data) {
-		return ("put" + SPACE + String.valueOf(pri) + SPACE
-				+ String.valueOf(delay) + SPACE + String.valueOf(ttr) + SPACE
-				+ String.valueOf(bytes) + END_STRING + new String(data))
-				.getBytes();
+	public final static byte[] put(Job job) {
+		return ("put" + SPACE + String.valueOf(job.getPriority()) + SPACE
+				+ String.valueOf(job.getDelay()) + SPACE
+				+ String.valueOf(job.getTime_to_run()) + SPACE
+				+ String.valueOf(job.getData().length) + END_STRING
+				+ new String(job.getData()) + END_STRING).getBytes();
 	}
 }

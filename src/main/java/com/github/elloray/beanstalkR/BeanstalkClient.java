@@ -29,27 +29,34 @@ public class BeanstalkClient {
 		pool = new MessageHandlerPool(servers, strategy);
 	}
 
-	public void use(String TubeName) {
-
+	public void use(String TubeName) throws IOException {
+		for (int i = 0; i < server_num; i++) {
+			pool.submit(BeanstalkCommands.use(TubeName), MsgType.COMMAND,
+					ResultCode.USE_OK);
+		}
 	}
 
-	public int put(Job job) {
+	public int put(Job job) throws IOException {
+		pool.submit(BeanstalkCommands.put(job), MsgType.COMMAND,
+				ResultCode.PUT_OK);
+		return 0;
+	}
+
+	public int asynput(Job job) throws IOException, InterruptedException {
+		pool.asynsubmit(BeanstalkCommands.put(job), MsgType.COMMAND,
+				ResultCode.PUT_OK);
 		return 0;
 	}
 
 	public Job reserve() throws IOException {
-		Job job = new Job(pool.submit(Commands.reserve(), MsgType.DATA,
-				ResultCode.RESERVE_OK).getDataBody());
+		Job job = new Job(pool.submit(BeanstalkCommands.reserve(),
+				MsgType.DATA, ResultCode.RESERVE_OK).getData());
 		return job;
 	}
 
-	public void asynreserve() throws IOException {
-		try {
-			pool.asynsubmit(Commands.reserve(), MsgType.DATA,
-					ResultCode.RESERVE_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void asynreserve() throws IOException, InterruptedException {
+		pool.asynsubmit(BeanstalkCommands.reserve(), MsgType.DATA,
+				ResultCode.RESERVE_OK);
 	}
 
 	public List<Job> getJobs(int num) throws InterruptedException,
@@ -57,53 +64,49 @@ public class BeanstalkClient {
 		List<Job> jobs = new ArrayList<Job>();
 		for (int i = 0; i < num; i++) {
 			Response response = pool.getResponse();
-			Job job = new Job(response.getDataBody());
-//			 job.setJobId();
+			Job job = new Job(response.getData());
 			jobs.add(job);
 		}
 		return jobs;
 	}
 
 	public Job reserve(int timeout) throws IOException {
-		Job job = new Job(pool.submit(Commands.reservewithTimeout(timeout),
-				MsgType.DATA, ResultCode.RESERVE_OK).getDataBody());
+		Response response = pool.submit(
+				BeanstalkCommands.reservewithTimeout(timeout), MsgType.DATA,
+				ResultCode.RESERVE_OK);
+		Job job = new Job(response.getData());
+		job.setJobId(Integer.parseInt(response.getHeader().getInfo()));
 		return job;
 	}
 
-	public int delete(int JobId) {
-		// TODO Auto-generated method stub
+	public int delete(Job job) throws IOException {
+		pool.submit(BeanstalkCommands.delete(job.getJobId()), MsgType.COMMAND,
+				ResultCode.DELETE_OK);
 		return 0;
 	}
 
 	public int release(int JobId) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public int bury(int JobId) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public int touch(int JobId) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public long watch(String TubeName) throws IOException,
 			InterruptedException, ExecutionException {
-
 		for (int i = 0; i < server_num; i++) {
-			pool.submit(Commands.watch(TubeName), MsgType.COMMAND, null);
-		}
-		for (int i = 0; i < server_num; i++) {
-			Job job = new Job(pool.getResponse().getCommandBody());
+			pool.submit(BeanstalkCommands.watch(TubeName), MsgType.COMMAND,
+					ResultCode.WATCH_OK);
 		}
 		return 0;
 	}
 
 	public long ignore(byte[] TubeName) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -117,21 +120,23 @@ public class BeanstalkClient {
 
 	public Map<String, String> stat(String server) throws IOException,
 			InterruptedException, ExecutionException {
-		pool.submit(Commands.stats(), MsgType.DATA, ResultCode.STATS_OK);
-		String string = new String(pool.getResponse().getDataBody());
+		pool.submit(BeanstalkCommands.stats(), MsgType.DATA,
+				ResultCode.STATS_OK);
+		String string = new String(pool.getResponse().getData());
 		Map<String, String> map = new HashMap<String, String>();
 		String[] tokens = string.split("\n");
 		for (int i = 2; i < tokens.length - 1; i++) {
 			String[] kv = tokens[i].split(":");
 			map.put(kv[0], kv[1]);
 		}
-		for (String key : map.keySet()) {
-			System.out.println(key + ":" + map.get(key));
-		}
+		// for (String key : map.keySet()) {
+		// System.out.println(key + ":" + map.get(key));
+		// }
 		return map;
 	}
 
 	public void stop() {
 		pool.stop();
 	}
+
 }

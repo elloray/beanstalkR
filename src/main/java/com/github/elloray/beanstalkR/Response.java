@@ -2,23 +2,23 @@ package com.github.elloray.beanstalkR;
 
 public class Response {
 	
-	private byte[] command;
+	private Header header;
 	
 	private byte[] data;
 
-	public byte[] getCommandBody() {
-		return command;
+	public Header getHeader() {
+		return header;
 	}
 
-	public void setCommandBody(byte[] command) {
-		this.command = command;
+	public void setHeader(Header header) {
+		this.header = header;
 	}
 
-	public byte[] getDataBody() {
+	public byte[] getData() {
 		return data;
 	}
 
-	public void setDataBody(byte[] data) {
+	public void setData(byte[] data) {
 		this.data = data;
 	}
 }

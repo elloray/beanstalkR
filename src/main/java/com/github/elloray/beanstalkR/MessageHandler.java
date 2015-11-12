@@ -6,13 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageHandler {
@@ -42,9 +36,9 @@ public class MessageHandler {
 			OutputStream out = socket.getOutputStream();
 			out.write(send);
 			out.flush();
-			response.setCommandBody(getCommandBody(in));
+			response.setHeader(getHeader(in));
 			if (type == MsgType.DATA) {
-				response.setDataBody(getDataBody(in, response, ErrorCode));
+				response.setData(getData(in, response, ErrorCode));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -53,7 +47,7 @@ public class MessageHandler {
 		return response;
 	}
 
-	private byte[] getCommandBody(InputStream in) throws IOException {
+	private Header getHeader(InputStream in) throws IOException {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		int next;
@@ -75,21 +69,22 @@ public class MessageHandler {
 		}
 		bos.flush();
 		bos.close();
-		return bos.toByteArray();
+		Header header = new Header(bos.toByteArray());
+		return header;
 	}
 
-	private byte[] getDataBody(InputStream in, Response response,
+	private byte[] getData(InputStream in, Response response,
 			String ErrorCode) throws IOException {
 		byte[] receive;
-		String command = new String(response.getCommandBody());
+		String command = new String(response.getHeader().getStatus());
 		/**
-		 * if command line doesn't start with normal response,then don't get
+		 * if command line doesn't start with correct response,then don't get
 		 * next data body
 		 */
 		if (!command.startsWith(ErrorCode)) {
-			return null;
+			throw new IOException(command);
 		}
-		String[] params = command.split(" ");
+		String[] params = response.getHeader().getInfo().split(" ");
 		receive = new byte[Integer.parseInt(params[params.length - 1].trim())];
 		in.read(receive);
 		in.read();

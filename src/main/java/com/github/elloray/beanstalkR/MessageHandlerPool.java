@@ -32,7 +32,7 @@ public class MessageHandlerPool {
 			messageHandlers.add(new MessageHandler(serverinfo[0], Integer
 					.parseInt(serverinfo[1])));
 		}
-		// init asynsubmit pool
+		// init asyn submit pool
 		executor = Executors.newFixedThreadPool(servers.size());
 	}
 
