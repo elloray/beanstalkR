@@ -87,6 +87,7 @@ public class MessageHandler {
 		String[] params = response.getHeader().getInfo().split(" ");
 		receive = new byte[Integer.parseInt(params[params.length - 1].trim())];
 		in.read(receive);
+		//skip \r\n
 		in.read();
 		in.read();
 		return receive;

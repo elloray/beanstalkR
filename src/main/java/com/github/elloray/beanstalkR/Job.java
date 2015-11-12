@@ -10,6 +10,10 @@ public class Job {
 
 	private final static int DEFAULT_DELAY = 0;
 
+	private final static long MIN_PROPRITY = 0L;
+
+	private final static long MAX_PROPRITY = 4294967295L;
+
 	private int JobId;
 
 	public int getJobId() {
@@ -51,7 +55,7 @@ public class Job {
 	public long getPriority() {
 		return priority;
 	}
-	
+
 	public byte[] getData() {
 		return data;
 	}
@@ -77,15 +81,18 @@ public class Job {
 	}
 
 	public Job(long priority, int delay, int time_to_run, byte[] data) {
-		
+		if ((priority > MAX_PROPRITY) || (priority < MIN_PROPRITY)) {
+			throw new IllegalArgumentException("priority is out of range");
+		}
 		this.priority = priority;
 		this.delay = delay;
 		this.time_to_run = time_to_run;
 		this.data = data;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return new String(data);
 	}
+
 }

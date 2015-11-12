@@ -5,16 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class BeanstalkClient {
-
-	private final static long MIN_PROPRITY = 4294967295L;
-
-	private final static long MAX_PROPRITY = 0L;
 
 	private MessageHandlerPool pool = null;
 
@@ -49,8 +42,11 @@ public class BeanstalkClient {
 	}
 
 	public Job reserve() throws IOException {
-		Job job = new Job(pool.submit(BeanstalkCommands.reserve(),
-				MsgType.DATA, ResultCode.RESERVE_OK).getData());
+		Response response = pool.submit(
+				BeanstalkCommands.reserve(), MsgType.DATA,
+				ResultCode.RESERVE_OK);
+		Job job = new Job(response.getData());
+		job.setJobId(Integer.parseInt(response.getHeader().getInfo().split(BeanstalkCommands.SPACE)[0]));
 		return job;
 	}
 
@@ -75,7 +71,8 @@ public class BeanstalkClient {
 				BeanstalkCommands.reservewithTimeout(timeout), MsgType.DATA,
 				ResultCode.RESERVE_OK);
 		Job job = new Job(response.getData());
-		job.setJobId(Integer.parseInt(response.getHeader().getInfo()));
+		System.out.println(response.getHeader().getInfo());
+		job.setJobId(Integer.parseInt(response.getHeader().getInfo().split(BeanstalkCommands.SPACE)[0]));
 		return job;
 	}
 
@@ -120,9 +117,9 @@ public class BeanstalkClient {
 
 	public Map<String, String> stat(String server) throws IOException,
 			InterruptedException, ExecutionException {
-		pool.submit(BeanstalkCommands.stats(), MsgType.DATA,
-				ResultCode.STATS_OK);
-		String string = new String(pool.getResponse().getData());
+		Response response = pool.submit(BeanstalkCommands.stats(),
+				MsgType.DATA, ResultCode.STATS_OK);
+		String string = new String(response.getData());
 		Map<String, String> map = new HashMap<String, String>();
 		String[] tokens = string.split("\n");
 		for (int i = 2; i < tokens.length - 1; i++) {

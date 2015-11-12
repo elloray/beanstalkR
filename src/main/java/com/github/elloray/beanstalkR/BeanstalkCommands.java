@@ -2,8 +2,8 @@ package com.github.elloray.beanstalkR;
 
 public class BeanstalkCommands {
 
-	private final static String END_STRING = "\r\n";
-	private final static String SPACE = " ";
+	public final static String END_STRING = "\r\n";
+	public final static String SPACE = " ";
 
 	public final static byte[] watch(String TubeName) {
 		return ("watch" + SPACE + TubeName + END_STRING).getBytes();
