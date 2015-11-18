@@ -61,6 +61,7 @@ public class BeanstalkClient {
 		for (int i = 0; i < num; i++) {
 			Response response = pool.getResponse();
 			Job job = new Job(response.getData());
+			job.setJobId(Integer.parseInt(response.getHeader().getInfo().split(BeanstalkCommands.SPACE)[0]));
 			jobs.add(job);
 		}
 		return jobs;
@@ -71,7 +72,6 @@ public class BeanstalkClient {
 				BeanstalkCommands.reservewithTimeout(timeout), MsgType.DATA,
 				ResultCode.RESERVE_OK);
 		Job job = new Job(response.getData());
-		System.out.println(response.getHeader().getInfo());
 		job.setJobId(Integer.parseInt(response.getHeader().getInfo().split(BeanstalkCommands.SPACE)[0]));
 		return job;
 	}
@@ -115,7 +115,7 @@ public class BeanstalkClient {
 		return null;
 	}
 
-	public Map<String, String> stat(String server) throws IOException,
+	public Map<String, String> stats(String server) throws IOException,
 			InterruptedException, ExecutionException {
 		Response response = pool.submit(BeanstalkCommands.stats(),
 				MsgType.DATA, ResultCode.STATS_OK);
@@ -126,9 +126,9 @@ public class BeanstalkClient {
 			String[] kv = tokens[i].split(":");
 			map.put(kv[0], kv[1]);
 		}
-		// for (String key : map.keySet()) {
-		// System.out.println(key + ":" + map.get(key));
-		// }
+//		 for (String key : map.keySet()) {
+//		 System.out.println(key + ":" + map.get(key));
+//		 }
 		return map;
 	}
 

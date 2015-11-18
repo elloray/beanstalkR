@@ -27,9 +27,7 @@ public class MessageHandler {
 
 	public synchronized Response sendMessage(byte[] send, MsgType type,
 			String ErrorCode) throws IOException {
-
 		Response response = new Response();
-
 		try {
 			socket.setTcpNoDelay(true);
 			InputStream in = socket.getInputStream();
@@ -73,8 +71,8 @@ public class MessageHandler {
 		return header;
 	}
 
-	private byte[] getData(InputStream in, Response response,
-			String ErrorCode) throws IOException {
+	private byte[] getData(InputStream in, Response response, String ErrorCode)
+			throws IOException {
 		byte[] receive;
 		String command = new String(response.getHeader().getStatus());
 		/**
@@ -87,7 +85,7 @@ public class MessageHandler {
 		String[] params = response.getHeader().getInfo().split(" ");
 		receive = new byte[Integer.parseInt(params[params.length - 1].trim())];
 		in.read(receive);
-		//skip \r\n
+		// skip \r\n
 		in.read();
 		in.read();
 		return receive;
