@@ -1,6 +1,7 @@
-package com.github.elloray.beanstalkR;
+package com.github.elloray.beanstalkR.util;
 
-public class BeanstalkCommands {
+
+public class BeanstalkMessage {
 
 	public final static String END_STRING = "\r\n";
 	public final static String SPACE = " ";

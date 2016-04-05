@@ -1,4 +1,4 @@
-package com.github.elloray.beanstalkR;
+package com.github.elloray.beanstalkR.strategy;
 
 public interface Strategy {
 

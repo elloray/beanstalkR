@@ -1,18 +1,20 @@
-package com.github.elloray.beanstalkR;
+package com.github.elloray.beanstalkR.handler;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.ietf.jgss.Oid;
+import com.github.elloray.beanstalkR.strategy.Strategy;
+import com.github.elloray.beanstalkR.util.MsgType;
+import com.github.elloray.beanstalkR.util.Response;
 
 public class MessageHandlerPool {
 
@@ -24,7 +26,7 @@ public class MessageHandlerPool {
 
 	private BlockingQueue<Future<Response>> futures = new LinkedBlockingQueue<Future<Response>>();
 
-	public MessageHandlerPool(List<String> servers, Strategy strategy) {
+	public MessageHandlerPool(List<String> servers, Strategy strategy) throws NumberFormatException, UnknownHostException, IOException {
 		this.strategy = strategy;
 		for (String server : servers) {
 			// init pool

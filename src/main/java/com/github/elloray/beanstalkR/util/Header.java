@@ -1,4 +1,5 @@
-package com.github.elloray.beanstalkR;
+package com.github.elloray.beanstalkR.util;
+
 
 public class Header {
 	
@@ -23,8 +24,8 @@ public class Header {
 	
 	public Header(byte[] headerbytes){
 		String header = new String(headerbytes);
-		if(header.contains(BeanstalkCommands.SPACE)){
-			String[] parts = header.split(BeanstalkCommands.SPACE, 2);
+		if(header.contains(BeanstalkMessage.SPACE)){
+			String[] parts = header.split(BeanstalkMessage.SPACE, 2);
 			setStatus(parts[0]);
 			setInfo(parts[1]);
 		}else {

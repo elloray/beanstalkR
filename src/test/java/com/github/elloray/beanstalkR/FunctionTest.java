@@ -11,6 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.github.elloray.beanstalkR.util.Job;
+
 public class FunctionTest {
 
 	private static BeanstalkClient client = null;

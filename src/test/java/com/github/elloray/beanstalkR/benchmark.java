@@ -140,7 +140,7 @@ public class benchmark {
 
 		start = System.currentTimeMillis();
 		for (int i = 0; i < NUM; i++) {
-			com.github.elloray.beanstalkR.Job job = client.reserve();
+			com.github.elloray.beanstalkR.util.Job job = client.reserve();
 			// System.out.println(new String(job.getData()));
 			// client.stat(host2);
 		}
